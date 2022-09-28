@@ -4,8 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config({ path: `${__dirname}/config/dev.env` });
 //const initDb = require("./dataBase/db").initDb;
-//const userRouter = require("./routes/UserRoute")();
-//const weRouter = require("./routes/WeRoute")();
+const exampleRouter = require("./routes/exampleRoute")();
 const app = express();
 
 app.use(cors());
@@ -18,5 +17,4 @@ app.use(bodyParser.json());
         console.log(`${'[APP-INFO]'} Listening on port ${process.env.SERVER_PORT}`);
     });
 //});
-//app.use("/user", userRouter);
-//app.use("/we",weRouter);
+app.use("/example", exampleRouter);
