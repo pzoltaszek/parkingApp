@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "concurrently \"cd CORE && node server.js\" \"cd gui && npm run start\"",
-    "core-dependencies": "npm install --prefix CORE",
-    "gui-dependencies": "npm install --prefix gui",
+    "core-dependencies": "cd CORE && npm install",
+    "gui-dependencies": "cd gui && npm install",
     "install-all-deps": "concurrently \"npm run core-dependencies\" \"npm run gui-dependencies\""
   },
   "author": "",
