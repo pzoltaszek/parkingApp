@@ -3,11 +3,11 @@ import ExampleService from '../services/ExampleService';
 
 export default function Dashboard() {
   const [count, setCount] = useState(0);
-  const [aaa, setAaa] = useState(null);
+  const [allUsers, setAllUsers] = useState([]);
 
   useEffect(() => {
     ExampleService.getExampleData()
-    .then(data => setAaa(data))
+    .then(data => setAllUsers(data))
   },[])
 
   return (
@@ -16,7 +16,9 @@ export default function Dashboard() {
       <button onClick={() => setCount(count + 1)}>
         Click me
       </button>
-      <p>aaa value is: {aaa}</p>
+      {allUsers.map(user => {
+        return <p key={user.email}>{user.email}</p>
+      })}
     </div>
   );
 }

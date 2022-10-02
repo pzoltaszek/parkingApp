@@ -1,13 +1,14 @@
 const express = require('express');
 const exampleRouter = express.Router();
+const Log = require('../utils/Log');
 
 function router() {
     exampleRouter.get("/getData", async (req, res) => {
         try {
-            console.log(`${'[APP-INFO]'} fetched "/example"`);
+            Log.info('fetched "/example"');
             return res.json({ success: true, data: "Siema" });
         } catch (error) {
-            console.log(`${'[APP-ERROR]'} fetched "/example" failed`);
+            Log.error('fetched "/example" failed');
         }
     });
 
