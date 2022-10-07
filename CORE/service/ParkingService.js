@@ -161,7 +161,6 @@ async function userOwnsParkingSlot(email) {
     try {
         let db = getDb();
 
-        //no priority to check if there is any not-owned parking place available
         let userParkingPlace = await db.collection(TABLE_NAME).findOne({
             owner_email: email
         });
