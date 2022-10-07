@@ -94,7 +94,7 @@ async function assignOwnerToPlaceForTomorrow(email) {
             db.collection(TABLE_NAME).updateOne({owner_email: email}, {$set: update});
         }
     } catch (error) {
-        Log.error('Database error: error in "assignOwnerToPlaceForToday"');
+        Log.error('Database error: error in "assignOwnerToPlaceForTomorrow"');
     }
 }
 
@@ -126,7 +126,7 @@ async function assignUserToPlaceForTomorrow(email, placeId) {
             db.collection(TABLE_NAME).updateOne({number: placeId}, {$set: update});
         }
     } catch (error) {
-        Log.error('Database error: error in "assignUserToPlaceForToday"');
+        Log.error('Database error: error in "assignUserToPlaceForTomorrow"');
     }
 }
 
