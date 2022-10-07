@@ -100,14 +100,12 @@ async function findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(email, bu
 }
 
 
-async function findParkingPlaceForTomorrowWithBuildingPriority(email, building) {
+async function findParkingPlaceForTomorrowWithBuildingPriority(building) {
     try {
         let db = getDb();
 
-        let today = new Date();
-        today.setHours(0, 0, 0, 0);
         let tomorrow = new Date();
-        tomorrow.setDate(today.getDate() + 1);
+        tomorrow.setDate(tomorrow.getDate() + 1);
 
         //no priority to check if there is any parking place available
         let anyParkingPlace = await db.collection(TABLE_NAME).findOne({
