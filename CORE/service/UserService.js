@@ -7,11 +7,10 @@ async function userHasAlreadyReservation(email, reservationForToday) {
     try {
         if (email) {
             let db = getDb();
-            let userWithReservation = await db.collection(TABLE_NAME).findOne({reservedBy: email});
+            let dateToCheck = createCorrectDateFormat(reservationForToday);
+            let userWithReservation = await db.collection(TABLE_NAME).findOne({reservedBy: email, reservationDate: dateToCheck });
             if (userWithReservation) {
-                return checkUserReservationDate(userWithReservation.reservationDate, reservationForToday);
-            } else {
-                false;
+                return true;
             }
         } else {
             Log.error('no user email provided');
@@ -20,25 +19,6 @@ async function userHasAlreadyReservation(email, reservationForToday) {
     } catch (error) {
         Log.error('Database error: cannot find user in "userHasAlreadyReservation"');
         return false;
-    }
-}
-
-function checkUserReservationDate(dateOfReservation, reservationForToday) {
-    if (!dateOfReservation) {
-        return false;
-    }
-    let now = new Date(),
-        dayNow = now.getDay(),
-        monthNow = now.getMonth() + 1, //in JS: JAN = 0, FEB =1 etc.
-        yearNow = now.getFullYear(),
-        dayReservation = dateOfReservation.getDay(),
-        monthReservation = dateOfReservation.getMonth() + 1,
-        yearReservation = dateOfReservation.getFullYear();
-    if (reservationForToday) {
-        return dayNow === dayReservation && monthNow === monthReservation && yearNow && yearReservation;
-    } else {
-        dayNow += 1; //for tommorrow
-        return dayNow === dayReservation && monthNow === monthReservation && yearNow && yearReservation;
     }
 }
 
@@ -132,11 +112,11 @@ async function assignUserToPlaceForTomorrow(email, placeId) {
 
 function createCorrectDateFormat(isToday){
     let today = new Date();
-    today.setHours(0, 0, 0, 0);
     if (isToday){
-        return today
+        return today.toLocaleDateString();
     } else {
-        return today.setDate(today.getDate() +1);
+        today.setDate(today.getDate() +1);
+        today.toLocaleDateString();
     }
 }
 
