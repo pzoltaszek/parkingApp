@@ -1,10 +1,12 @@
 import './App.css';
-import Dashboard from './components/Dashboard.js';
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+import LoginPage from "./components/LoginPage";
 
 function App() {
   return (
     <div className="App">
-      <Dashboard/>
+      <LoginPage />
     </div>
   );
 }
