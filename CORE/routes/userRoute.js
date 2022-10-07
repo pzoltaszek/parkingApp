@@ -63,9 +63,9 @@ function router() {
     });
 
     userRouter.post("/assignUser", async (req, res) => {
-        const {email, pass, building, reservationForToday} = req.body;
+        const {email, hashedPass, building, reservationForToday} = req.body;
         try {
-            if (!await LoginService.login(email, pass)) {
+            if (!await LoginService.login(email, hashedPass)) {
                 return res.json({success: false, data: 'LOGIN_FAILED'});
             }
             if (await UserService.userHasAlreadyReservation(email, reservationForToday)) {
@@ -80,12 +80,12 @@ function router() {
                     await UserService.assignOwnerToPlaceForToday(email);
                     return res.json({success: true, data: 'OWNER_PLACE_ASSIGNED'});
                 } else {
-                    ParkingPlace
+                    Object
                     place = await ParkingService.findParkingPlaceForTodayWithBuildingPriority(building); //TODO: trzeba zdecydować czy priorytet ma budynek czy własność
                     if (place == null) {
                         return res.json({success: false, data: 'NO_PLACE_AVAILABLE'});
                     } else {
-                        await UserService.assignUserToPlaceForToday(email, place.id);
+                        await UserService.assignUserToPlaceForToday(email, place._id);
                         return res.json({success: true, data: {number: place.number, building: place.building}});
                     }
                 }
@@ -94,16 +94,16 @@ function router() {
                     return res.json({success: false, data: 'TOO_EARLY_FOR_TOMORROW_RESERVATION'}); //za wcześnie na jakiekolwiek rezerwacje na jutro, bo w bazie są jeszcze informacje o dzisiejszych rezerwacjach
                 }
                 if (actualHour < 15) { //tylko właściciel może rezerwować przed 15:00 na jutro
-                    if (await UserService.userOwnsParkingSlot(email)) {
+                    if (await ParkingService.userOwnsParkingSlot(email)) {
                         await UserService.assignOwnerToPlaceForTomorrow(email);
                         return res.json({success: true, data: 'OWNER_PLACE_ASSIGNED'});
                     } else {
-                        ParkingPlace
+                        Object
                         place = await ParkingService.findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(building); //przed 15:00 można się przypisać tylko do miejsc bez rejestracji
                         if (place == null) {
                             return res.json({success: false, data: 'NO_NOT_OWNED_PLACE_AVAILABLE_TRY_LATER'});
                         } else {
-                            await UserService.assignUserToPlaceForTomorrow(email, place.id);
+                            await UserService.assignUserToPlaceForTomorrow(email, place._id);
                             return res.json({success: true, data: {number: place.number, building: place.building}});
                         }
                     }
@@ -112,12 +112,12 @@ function router() {
                         await UserService.assignOwnerToPlaceForTomorrow(email);
                         return res.json({success: true, data: 'OWNER_PLACE_ASSIGNED'});
                     } else {
-                        ParkingPlace
+                        Object
                         place = await ParkingService.findParkingPlaceForTomorrowWithBuildingPriority(building); //TODO: trzeba zdecydować czy priorytet ma budynek czy własność
                         if (place == null) {
                             return res.json({success: false, data: 'NO_PLACE_AVAILABLE'});
                         } else {
-                            await UserService.assignUserToPlaceForTomorrow(email, place.id);
+                            await UserService.assignUserToPlaceForTomorrow(email, place._id);
                             return res.json({success: true, data: {number: place.number, building: place.building}});
                         }
                     }
@@ -133,12 +133,12 @@ function router() {
     userRouter.post("/unassignUser", async (req, res) => {
         const {email, hashedPass, reservationForToday} = req.body;
         try {
-            if (!await UserService.login(email, hashedPass)) {
-                return {success: false, data: 'LOGIN_FAILED'};
+            if (!await LoginService.login(email, hashedPass)) {
+                return res.json({success: false, data: 'LOGIN_FAILED'});
             }
             if (await UserService.userHasAlreadyReservation(email, reservationForToday)) {
-                await UserService.resetReservation(email, reservationForToday); //ustaw datę na przeszłość/null, wyczyść reservedBy
-                return {success: true, data: 'RESERVATION_RESET'};
+                await ParkingService.resetReservation(email, reservationForToday); //ustaw datę na przeszłość/null, wyczyść reservedBy
+                return res.json({success: true, data: 'RESERVATION_RESET'});
             }
         } catch (error) { //any error (?)
             Log.error('Error ' + error);
@@ -147,6 +147,6 @@ function router() {
     });
 
     return userRouter;
-};
+}
 
 module.exports = router;

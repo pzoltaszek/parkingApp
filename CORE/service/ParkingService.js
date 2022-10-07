@@ -12,7 +12,7 @@ async function findParkingPlaceForTodayWithBuildingPriority(building) {
 
         //no priority to check if there is any parking place available
         let anyParkingPlace = await db.collection(TABLE_NAME).findOne({
-            reservationDate: {$not: {$eq: today}}
+            reservationDate: {$not: {$eq: today.toLocaleDateString()}}
         });
 
         if (anyParkingPlace == null) {
@@ -24,7 +24,7 @@ async function findParkingPlaceForTodayWithBuildingPriority(building) {
         parkingPlace = await db.collection(TABLE_NAME).findOne({
             building: building,
             owner_email: '',
-            reservationDate: {$not: {$eq: today}}
+            reservationDate: {$not: {$eq: today.toLocaleDateString()}}
         });
 
         if (parkingPlace != null) {
@@ -34,7 +34,7 @@ async function findParkingPlaceForTodayWithBuildingPriority(building) {
         //owner priority
         parkingPlace = await db.collection(TABLE_NAME).findOne({
             owner_email: '',
-            reservationDate: {$not: {$eq: today}}
+            reservationDate: {$not: {$eq: today.toLocaleDateString()}}
         });
 
         if (parkingPlace != null) {
@@ -44,7 +44,7 @@ async function findParkingPlaceForTodayWithBuildingPriority(building) {
         //building priority
         parkingPlace = await db.collection(TABLE_NAME).findOne({
             building: building,
-            reservationDate: {$not: {$eq: today}}
+            reservationDate: {$not: {$eq: today.toLocaleDateString()}}
         });
 
         if (parkingPlace != null) {
@@ -71,7 +71,7 @@ async function findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(email, bu
 
         //no priority to check if there is any not-owned parking place available
         let anyParkingPlace = await db.collection(TABLE_NAME).findOne({
-            reservationDate: {$not: {$eq: tomorrow}},
+            reservationDate: {$not: {$eq: tomorrow.toLocaleDateString()}},
             owner_email: ''
         });
 
@@ -84,7 +84,7 @@ async function findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(email, bu
         parkingPlace = await db.collection(TABLE_NAME).findOne({
             building: building,
             owner_email: '',
-            reservationDate: {$not: {$eq: tomorrow}}
+            reservationDate: {$not: {$eq: tomorrow.toLocaleDateString()}}
         });
 
         if (parkingPlace != null) {
@@ -110,7 +110,7 @@ async function findParkingPlaceForTomorrowWithBuildingPriority(email, building) 
 
         //no priority to check if there is any parking place available
         let anyParkingPlace = await db.collection(TABLE_NAME).findOne({
-            reservationDate: {$not: {$eq: tomorrow}}
+            reservationDate: {$not: {$eq: tomorrow.toLocaleDateString()}}
         });
 
         if (anyParkingPlace == null) {
@@ -122,7 +122,7 @@ async function findParkingPlaceForTomorrowWithBuildingPriority(email, building) 
         parkingPlace = await db.collection(TABLE_NAME).findOne({
             building: building,
             owner_email: '',
-            reservationDate: {$not: {$eq: tomorrow}}
+            reservationDate: {$not: {$eq: tomorrow.toLocaleDateString()}}
         });
 
         if (parkingPlace != null) {
@@ -132,7 +132,7 @@ async function findParkingPlaceForTomorrowWithBuildingPriority(email, building) 
         //owner priority
         parkingPlace = await db.collection(TABLE_NAME).findOne({
             owner_email: '',
-            reservationDate: {$not: {$eq: tomorrow}}
+            reservationDate: {$not: {$eq: tomorrow.toLocaleDateString()}}
         });
 
         if (parkingPlace != null) {
@@ -142,7 +142,7 @@ async function findParkingPlaceForTomorrowWithBuildingPriority(email, building) 
         //building priority
         parkingPlace = await db.collection(TABLE_NAME).findOne({
             building: building,
-            reservationDate: {$not: {$eq: tomorrow}}
+            reservationDate: {$not: {$eq: tomorrow.toLocaleDateString()}}
         });
 
         if (parkingPlace != null) {
@@ -157,8 +157,54 @@ async function findParkingPlaceForTomorrowWithBuildingPriority(email, building) 
     }
 }
 
+async function userOwnsParkingSlot(email) {
+    try {
+        let db = getDb();
+
+        let userParkingPlace = await db.collection(TABLE_NAME).findOne({
+            owner_email: email
+        });
+
+        return userParkingPlace != null;
+
+    } catch (error) {
+        Log.error('userOwnsParkingSlot error: ' + error);
+        return false;
+    }
+}
+
+async function resetReservation(email, reservationForToday) {
+    try {
+        let db = getDb();
+
+        let dateToCheck = new Date();
+        dateToCheck.setHours(0, 0, 0, 0);
+
+        if (!reservationForToday) {
+            dateToCheck = new Date(dateToCheck.getDate() + 1);
+        }
+
+        const update = {
+            reservedBy: '',
+            reservationDate: ''
+        };
+
+        await db.collection(TABLE_NAME).updateOne({
+                reservedBy: email,
+                reservationDate: dateToCheck.toLocaleDateString()
+            },
+            {$set: update});
+
+    } catch (error) {
+        Log.error('resetReservation error: ' + error);
+        return false;
+    }
+}
+
 module.exports = {
     findParkingPlaceForTodayWithBuildingPriority,
     findNotOwnedParkingPlaceForTomorrowWithBuildingPriority,
-    findParkingPlaceForTomorrowWithBuildingPriority
+    findParkingPlaceForTomorrowWithBuildingPriority,
+    userOwnsParkingSlot,
+    resetReservation
 }
