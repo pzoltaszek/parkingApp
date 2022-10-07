@@ -3,6 +3,7 @@ const userRouter = express.Router();
 const Log = require('../utils/Log');
 const getDb = require(".././dataBase/db").getDb;
 const UserService  = require('../service/UserService');
+const ParkingService = require('../service/ParkingService');
 
 const tableName = 't_email';
 
@@ -70,7 +71,7 @@ function router() {
                 return res.json({success: false, data: 'RESERVATION_ALREADY_EXISTING'});
             }
             if (reservationForToday) {
-                if ((new Date()).getHours() > 13) {
+                if (Date.now().getHours() > 13) {
                     return {success: false, data: 'TOO_LATE_FOR_TODAY_RESERVATION'}; //nie ma sensu już tak późno rezerwować na dziś
                 }
                 if (await UserService.userOwnsParkingSlotAndItsAvailable(email, reservationForToday)) { //miejsce właściciela może być już zajęte
@@ -78,7 +79,7 @@ function router() {
                     return {success: true, data: 'OWNER_PLACE_ASSIGNED'};
                 } else {
                     ParkingPlace
-                    place = await UserService.findParkingPlaceForTodayWithBuildingPriority(email, building); //TODO: trzeba zdecydować czy priorytet ma budynek czy własność
+                    place = await ParkingService.findParkingPlaceForTodayWithBuildingPriority(building); //TODO: trzeba zdecydować czy priorytet ma budynek czy własność
                     if (place == null) {
                         return {success: false, data: 'NO_PLACE_AVAILABLE'};
                     } else {
@@ -87,16 +88,16 @@ function router() {
                     }
                 }
             } else { //rezerwacja na jutro
-                if ((new Date()).getHours() < 13) {
+                if (Date.now().getHours() < 13) {
                     return {success: false, data: 'TOO_EARLY_FOR_TOMORROW_RESERVATION'}; //za wcześnie na jakiekolwiek rezerwacje na jutro, bo w bazie są jeszcze informacje o dzisiejszych rezerwacjach
                 }
-                if ((new Date()).getHours() < 15) { //tylko właściciel może rezerwować przed 15:00 na jutro
+                if (Date.now().getHours() < 15) { //tylko właściciel może rezerwować przed 15:00 na jutro
                     if (await UserService.userOwnsParkingSlot(email)) {
                         await UserService.assignOwnerToPlaceForTomorrow(email);
                         return {success: true, data: 'OWNER_PLACE_ASSIGNED'};
                     } else {
                         ParkingPlace
-                        place = await UserService.findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(email, building); //przed 15:00 można się przypisać tylko do miejsc bez rejestracji
+                        place = await ParkingService.findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(building); //przed 15:00 można się przypisać tylko do miejsc bez rejestracji
                         if (place == null) {
                             return {success: false, data: 'NO_NOT_OWNED_PLACE_AVAILABLE_TRY_LATER'};
                         } else {
@@ -110,7 +111,7 @@ function router() {
                         return {success: true, data: 'OWNER_PLACE_ASSIGNED'};
                     } else {
                         ParkingPlace
-                        place = await UserService.findParkingPlaceForTomorrowWithBuildingPriority(email, building); //TODO: trzeba zdecydować czy priorytet ma budynek czy własność
+                        place = await ParkingService.findParkingPlaceForTomorrowWithBuildingPriority(building); //TODO: trzeba zdecydować czy priorytet ma budynek czy własność
                         if (place == null) {
                             return {success: false, data: 'NO_PLACE_AVAILABLE'};
                         } else {
