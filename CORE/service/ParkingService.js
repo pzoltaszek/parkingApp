@@ -157,8 +157,54 @@ async function findParkingPlaceForTomorrowWithBuildingPriority(email, building) 
     }
 }
 
+async function userOwnsParkingSlot(email) {
+    try {
+        let db = getDb();
+
+        let userParkingPlace = await db.collection(TABLE_NAME).findOne({
+            owner_email: email
+        });
+
+        return userParkingPlace != null;
+
+    } catch (error) {
+        Log.error('userOwnsParkingSlot error: ' + error);
+        return false;
+    }
+}
+
+async function resetReservation(email, reservationForToday) {
+    try {
+        let db = getDb();
+
+        let dateToCheck = new Date();
+        dateToCheck.setHours(0, 0, 0, 0);
+
+        if (!reservationForToday) {
+            dateToCheck = new Date(dateToCheck.getDate() + 1);
+        }
+
+        const update = {
+            reservedBy: '',
+            reservationDate: new Date(1900, 10, 10)
+        };
+
+        await db.collection(TABLE_NAME).findOne({
+                reservedBy: email,
+                reservationDate: dateToCheck
+            },
+            {$set: update});
+
+    } catch (error) {
+        Log.error('resetReservation error: ' + error);
+        return false;
+    }
+}
+
 module.exports = {
     findParkingPlaceForTodayWithBuildingPriority,
     findNotOwnedParkingPlaceForTomorrowWithBuildingPriority,
-    findParkingPlaceForTomorrowWithBuildingPriority
+    findParkingPlaceForTomorrowWithBuildingPriority,
+    userOwnsParkingSlot,
+    resetReservation
 }
