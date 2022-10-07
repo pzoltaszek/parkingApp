@@ -1,6 +1,6 @@
 
 const ExampleService = {
-    getExampleData: async() => {
+    getExampleData: async () => {
         let res = await fetch('http://localhost:3001/user/getAllUser');
         let data = await res.json();
         if (data.success !== true) {

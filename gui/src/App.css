@@ -28,10 +28,32 @@
   color: #61dafb;
 }
 
+.form-container {
+  width: 30%;
+  margin: 10rem auto;
+  background: rgb(238, 174, 202);
+  background: linear-gradient(90deg, rgba(238, 174, 202, 1) 0%, rgba(148, 187, 233, 1) 100%);
+  border-radius: 5px;
+  padding: 4rem 6rem 1.5rem;
+  box-shadow: 10px 5px 5px whitesmoke;
+}
+
+.select-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+}
+
+.radio-buttons-container {
+  text-align: left;
+}
+
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
