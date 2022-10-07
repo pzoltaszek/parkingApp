@@ -123,7 +123,7 @@ async function assignUserToPlaceForTomorrow(email, placeId) {
                 reservedBy: email,
                 reservationDate: tomorrow
             };
-            db.collection(TABLE_NAME).updateOne({number: placeId}, {$set: update});
+            db.collection(TABLE_NAME).updateOne({id: placeId}, {$set: update});
         }
     } catch (error) {
         Log.error('Database error: error in "assignUserToPlaceForTomorrow"');

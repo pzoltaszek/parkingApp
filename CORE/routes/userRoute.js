@@ -85,7 +85,7 @@ function router() {
                     if (place == null) {
                         return res.json({success: false, data: 'NO_PLACE_AVAILABLE'});
                     } else {
-                        await UserService.assignUserToPlaceForToday(email, place.id);
+                        await UserService.assignUserToPlaceForToday(email, place._id);
                         return res.json({success: true, data: {number: place.number, building: place.building}});
                     }
                 }
