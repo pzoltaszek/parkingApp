@@ -4,6 +4,7 @@ const Log = require('../utils/Log');
 const getDb = require(".././dataBase/db").getDb;
 const UserService  = require('../service/UserService');
 const LoginService  = require('../service/LoginService');
+const ParkingService = require('../service/ParkingService');
 
 const tableName = 't_email';
 
@@ -80,7 +81,7 @@ function router() {
                     return res.json({success: true, data: 'OWNER_PLACE_ASSIGNED'});
                 } else {
                     ParkingPlace
-                    place = await UserService.findParkingPlaceForTodayWithBuildingPriority(email, building); //TODO: trzeba zdecydować czy priorytet ma budynek czy własność
+                    place = await ParkingService.findParkingPlaceForTodayWithBuildingPriority(building); //TODO: trzeba zdecydować czy priorytet ma budynek czy własność
                     if (place == null) {
                         return res.json({success: false, data: 'NO_PLACE_AVAILABLE'});
                     } else {
@@ -98,7 +99,7 @@ function router() {
                         return res.json({success: true, data: 'OWNER_PLACE_ASSIGNED'});
                     } else {
                         ParkingPlace
-                        place = await UserService.findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(email, building); //przed 15:00 można się przypisać tylko do miejsc bez rejestracji
+                        place = await ParkingService.findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(building); //przed 15:00 można się przypisać tylko do miejsc bez rejestracji
                         if (place == null) {
                             return res.json({success: false, data: 'NO_NOT_OWNED_PLACE_AVAILABLE_TRY_LATER'});
                         } else {
@@ -112,7 +113,7 @@ function router() {
                         return res.json({success: true, data: 'OWNER_PLACE_ASSIGNED'});
                     } else {
                         ParkingPlace
-                        place = await UserService.findParkingPlaceForTomorrowWithBuildingPriority(email, building); //TODO: trzeba zdecydować czy priorytet ma budynek czy własność
+                        place = await ParkingService.findParkingPlaceForTomorrowWithBuildingPriority(building); //TODO: trzeba zdecydować czy priorytet ma budynek czy własność
                         if (place == null) {
                             return res.json({success: false, data: 'NO_PLACE_AVAILABLE'});
                         } else {
