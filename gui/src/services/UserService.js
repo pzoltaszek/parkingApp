@@ -10,7 +10,7 @@ const UserService = {
         }
     },
 
-    assignUser: async (email, pass, building, reservationForToday) => {
+    assignUser: async (email, hashedPass, building, reservationForToday) => {
         let res = await fetch('http://localhost:3001/user/assignUser', {
             method: "POST",
             headers: {
@@ -18,7 +18,7 @@ const UserService = {
             },
             body: JSON.stringify({
                 email: email,
-                pass: pass,
+                hashedPass: hashedPass,
                 building: building,
                 reservationForToday: reservationForToday
             })

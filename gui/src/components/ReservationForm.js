@@ -19,13 +19,15 @@ export default function ReservationForm() {
 
     const onSubmitForm = (event) => {
         event.preventDefault();
-        sha512(password).then(hashedPassword => {
-            UserService.assignUser(email, hashedPassword, building, reservationForToday).then(response => {
-                setSuccess(response.success);
-                setShowToast(true);
-                setToastMessage(`success: ${response.success} data: ${response.data}`);
-            });
-        })
+        if (!showToast) {
+            sha512(password).then(hashedPass => {
+                UserService.assignUser(email, hashedPass, building, reservationForToday).then(response => {
+                    setSuccess(response.success);
+                    setShowToast(true);
+                    setToastMessage(`success: ${response.success} data: ${response.data}`);
+                });
+            })
+        }
     }
     const cancelReservation = () => {
         //TODO
