@@ -61,7 +61,7 @@ async function findParkingPlaceForTodayWithBuildingPriority(building) {
 }
 
 
-async function findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(email, building) {
+async function findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(building) {
     try {
         let db = getDb();
 
