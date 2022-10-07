@@ -62,26 +62,26 @@ function router() {
     userRouter.post("/assignUser", async (req, res) => {
         const {email, hashedPass, building, reservationForToday} = req.body;
         try {
-            if (!UserService.login(email, hashedPass)) {
+            if (!await UserService.login(email, hashedPass)) {
                 return res.json({success: false, data: 'LOGIN_FAILED'});
             }
-            if (UserService.userHasAlreadyReservation(email, reservationForToday)) {
+            if (await UserService.userHasAlreadyReservation(email, reservationForToday)) {
                 return res.json({success: false, data: 'RESERVATION_ALREADY_EXISTING'});
             }
             if (reservationForToday) {
                 if ((new Date()).getHours() > 13) {
                     return {success: false, data: 'TOO_LATE_FOR_TODAY_RESERVATION'}; //nie ma sensu już tak późno rezerwować na dziś
                 }
-                if (UserService.userOwnsParkingSlotAndItsAvailable(email, reservationForToday)) { //miejsce właściciela może być już zajęte
-                    UserService.assignOwnerToPlaceForToday(email);
+                if (await UserService.userOwnsParkingSlotAndItsAvailable(email, reservationForToday)) { //miejsce właściciela może być już zajęte
+                    await UserService.assignOwnerToPlaceForToday(email);
                     return {success: true, data: 'OWNER_PLACE_ASSIGNED'};
                 } else {
                     ParkingPlace
-                    place = UserService.findParkingPlaceForTodayWithBuildingPriority(email, building); //TODO: trzeba zdecydować czy priorytet ma budynek czy własność
+                    place = await UserService.findParkingPlaceForTodayWithBuildingPriority(email, building); //TODO: trzeba zdecydować czy priorytet ma budynek czy własność
                     if (place == null) {
                         return {success: false, data: 'NO_PLACE_AVAILABLE'};
                     } else {
-                        UserService.assignUserToPlaceForToday(email, place.id);
+                        await UserService.assignUserToPlaceForToday(email, place.id);
                         return {success: true, data: {number: place.number, building: place.building}};
                     }
                 }
@@ -90,30 +90,30 @@ function router() {
                     return {success: false, data: 'TOO_EARLY_FOR_TOMORROW_RESERVATION'}; //za wcześnie na jakiekolwiek rezerwacje na jutro, bo w bazie są jeszcze informacje o dzisiejszych rezerwacjach
                 }
                 if ((new Date()).getHours() < 15) { //tylko właściciel może rezerwować przed 15:00 na jutro
-                    if (UserService.userOwnsParkingSlot(email)) {
-                        UserService.assignOwnerToPlaceForTomorrow(email);
+                    if (await UserService.userOwnsParkingSlot(email)) {
+                        await UserService.assignOwnerToPlaceForTomorrow(email);
                         return {success: true, data: 'OWNER_PLACE_ASSIGNED'};
                     } else {
                         ParkingPlace
-                        place = UserService.findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(email, building); //przed 15:00 można się przypisać tylko do miejsc bez rejestracji
+                        place = await UserService.findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(email, building); //przed 15:00 można się przypisać tylko do miejsc bez rejestracji
                         if (place == null) {
                             return {success: false, data: 'NO_NOT_OWNED_PLACE_AVAILABLE_TRY_LATER'};
                         } else {
-                            UserService.assignUserToPlaceForTomorrow(email, place.id);
+                            await UserService.assignUserToPlaceForTomorrow(email, place.id);
                             return {success: true, data: {number: place.number, building: place.building}};
                         }
                     }
                 } else {
-                    if (UserService.userOwnsParkingSlotAndItsAvailable(email, reservationForToday)) { //po 15:00 własne miejsce może już być zajęte przez kogoś innego
-                        UserService.assignOwnerToPlaceForTomorrow(email);
+                    if (await UserService.userOwnsParkingSlotAndItsAvailable(email, reservationForToday)) { //po 15:00 własne miejsce może już być zajęte przez kogoś innego
+                        await UserService.assignOwnerToPlaceForTomorrow(email);
                         return {success: true, data: 'OWNER_PLACE_ASSIGNED'};
                     } else {
                         ParkingPlace
-                        place = UserService.findParkingPlaceForTomorrowWithBuildingPriority(email, building); //TODO: trzeba zdecydować czy priorytet ma budynek czy własność
+                        place = await UserService.findParkingPlaceForTomorrowWithBuildingPriority(email, building); //TODO: trzeba zdecydować czy priorytet ma budynek czy własność
                         if (place == null) {
                             return {success: false, data: 'NO_PLACE_AVAILABLE'};
                         } else {
-                            UserService.assignUserToPlaceForTomorrow(email, place.id);
+                            await UserService.assignUserToPlaceForTomorrow(email, place.id);
                             return {success: true, data: {number: place.number, building: place.building}};
                         }
                     }
@@ -129,11 +129,11 @@ function router() {
     userRouter.post("/unassignUser", async (req, res) => {
         const {email, hashedPass, reservationForToday} = req.body;
         try {
-            if (!UserService.login(email, hashedPass)) {
+            if (!await UserService.login(email, hashedPass)) {
                 return {success: false, data: 'LOGIN_FAILED'};
             }
-            if (UserService.userHasAlreadyReservation(email, reservationForToday)) {
-                UserService.resetReservation(email, reservationForToday); //ustaw datę na przeszłość/null, wyczyść reservedBy
+            if (await UserService.userHasAlreadyReservation(email, reservationForToday)) {
+                await UserService.resetReservation(email, reservationForToday); //ustaw datę na przeszłość/null, wyczyść reservedBy
                 return {success: true, data: 'RESERVATION_RESET'};
             }
         } catch (error) { //any error (?)
