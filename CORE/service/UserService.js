@@ -85,7 +85,7 @@ async function assignUserToPlaceForToday(email, placeId) {
                 reservedBy: email,
                 reservationDate: today
             };
-            db.collection(TABLE_NAME).updateOne({number: placeId}, {$set: update});
+            db.collection(TABLE_NAME).updateOne({_id: placeId}, {$set: update});
         }
     } catch (error) {
         Log.error('Database error: error in "assignUserToPlaceForToday"');
@@ -101,7 +101,7 @@ async function assignUserToPlaceForTomorrow(email, placeId) {
                 reservedBy: email,
                 reservationDate: tomorrow
             };
-            db.collection(TABLE_NAME).updateOne({id: placeId}, {$set: update});
+            db.collection(TABLE_NAME).updateOne({_id: placeId}, {$set: update});
         }
     } catch (error) {
         Log.error('Database error: error in "assignUserToPlaceForTomorrow"');
@@ -114,7 +114,7 @@ function createCorrectDateFormat(isToday){
         return today.toLocaleDateString();
     } else {
         today.setDate(today.getDate() +1);
-        today.toLocaleDateString();
+        return today.toLocaleDateString();
     }
 }
 

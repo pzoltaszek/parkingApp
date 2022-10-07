@@ -189,7 +189,7 @@ async function resetReservation(email, reservationForToday) {
             reservationDate: ''
         };
 
-        await db.collection(TABLE_NAME).findOne({
+        await db.collection(TABLE_NAME).updateOne({
                 reservedBy: email,
                 reservationDate: dateToCheck.toLocaleDateString()
             },

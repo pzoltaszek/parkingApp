@@ -63,9 +63,9 @@ function router() {
     });
 
     userRouter.post("/assignUser", async (req, res) => {
-        const {email, pass, building, reservationForToday} = req.body;
+        const {email, hashedPass, building, reservationForToday} = req.body;
         try {
-            if (!await LoginService.login(email, pass)) {
+            if (!await LoginService.login(email, hashedPass)) {
                 return res.json({success: false, data: 'LOGIN_FAILED'});
             }
             if (await UserService.userHasAlreadyReservation(email, reservationForToday)) {
@@ -103,7 +103,7 @@ function router() {
                         if (place == null) {
                             return res.json({success: false, data: 'NO_NOT_OWNED_PLACE_AVAILABLE_TRY_LATER'});
                         } else {
-                            await UserService.assignUserToPlaceForTomorrow(email, place.id);
+                            await UserService.assignUserToPlaceForTomorrow(email, place._id);
                             return res.json({success: true, data: {number: place.number, building: place.building}});
                         }
                     }
@@ -117,7 +117,7 @@ function router() {
                         if (place == null) {
                             return res.json({success: false, data: 'NO_PLACE_AVAILABLE'});
                         } else {
-                            await UserService.assignUserToPlaceForTomorrow(email, place.id);
+                            await UserService.assignUserToPlaceForTomorrow(email, place._id);
                             return res.json({success: true, data: {number: place.number, building: place.building}});
                         }
                     }
