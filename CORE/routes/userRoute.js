@@ -133,12 +133,12 @@ function router() {
     userRouter.post("/unassignUser", async (req, res) => {
         const {email, hashedPass, reservationForToday} = req.body;
         try {
-            if (!await UserService.login(email, hashedPass)) {
-                return {success: false, data: 'LOGIN_FAILED'};
+            if (!await LoginService.login(email, hashedPass)) {
+                return res.json({success: false, data: 'LOGIN_FAILED'});
             }
             if (await UserService.userHasAlreadyReservation(email, reservationForToday)) {
                 await UserService.resetReservation(email, reservationForToday); //ustaw datę na przeszłość/null, wyczyść reservedBy
-                return {success: true, data: 'RESERVATION_RESET'};
+                return res.json({success: true, data: 'RESERVATION_RESET'});
             }
         } catch (error) { //any error (?)
             Log.error('Error ' + error);
@@ -147,6 +147,6 @@ function router() {
     });
 
     return userRouter;
-};
+}
 
 module.exports = router;
