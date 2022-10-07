@@ -42,7 +42,54 @@ function checkUserReservationDate(dateOfReservation, reservationForToday) {
     }
 }
 
+async function userOwnsParkingSlotAndItsAvailable(email, reservationForToday) {
+    try {
+        if (email) {
+            let db = getDb();
+            let dateToCheck = new Date();
+            dateToCheck.setHours(0, 0, 0, 0);
+            if (!reservationForToday) {
+                let tomorrow = new Date(dateToCheck)
+                tomorrow.setDate(tomorrow.getDate() + 1)
+                tomorrow.setHours(0, 0, 0, 0);
+                dateToCheck = tomorrow;
+            }
+            let owner = await db.collection(TABLE_NAME).findOne({
+                owner_email: email,
+                reservationDate: {$not: {$eq: dateToCheck}}
+            });
+            if (owner) {
+                return !!owner.reservedBy;
+            } else {
+                false;
+            }
+        } else {
+            Log.error('no user email provided');
+            return false;
+        }
+    } catch (error) {
+        Log.error('Database error: cannot find user in "assignOwnerToPlaceForToday"');
+        return false;
+    }
+}
+
+async function assignOwnerToPlaceForToday(email) {
+    try {
+        if (email) {
+            let today = new Date();
+            today.setHours(0, 0, 0, 0);
+            db.collection(TABLE_NAME).insertOne({
+                reservedBy: email,
+                reservationDate: today
+            });
+        }
+    } catch (error) {
+        Log.error('Database error: cannot find user in "assignOwnerToPlaceForToday"');
+    }
+}
 
 module.exports = {
-    userHasAlreadyReservation
+    userHasAlreadyReservation,
+    userOwnsParkingSlotAndItsAvailable,
+    assignOwnerToPlaceForToday
 }
