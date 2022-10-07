@@ -8,52 +8,49 @@ async function findParkingPlaceForTodayWithBuildingPriority(building) {
         let db = getDb();
 
         let today = new Date();
-        today.setHours(0, 0, 0,0);
+        today.setHours(0, 0, 0, 0);
 
         //no priority to check if there is any parking place available
         let anyParkingPlace = await db.collection(TABLE_NAME).findOne({
-                reservationDate: { $not:{$eq: today }}
-            });
+            reservationDate: {$not: {$eq: today}}
+        });
 
-        if(anyParkingPlace == null) {
+        if (anyParkingPlace == null) {
             return null;
-        };
+        }
 
         //perform further check with priority filtering
         //building and owner priority
         parkingPlace = await db.collection(TABLE_NAME).findOne({
             building: building,
-            owner_email: null,
-            reservationDate: { $not:{$eq: today }}
-        }).toArray(function(err, result) {
-            if (err) throw err;
-            parkingPlaceList = result;
-            //db.close(); //TODO: close?
+            owner_email: '',
+            reservationDate: {$not: {$eq: today}}
         });
 
-        if(parkingPlace != null) {
+        if (parkingPlace != null) {
             return parkingPlace;
         }
 
         //owner priority
         parkingPlace = await db.collection(TABLE_NAME).findOne({
-            owner_email: null,
-            reservationDate: { $not:{$eq: today }}
+            owner_email: '',
+            reservationDate: {$not: {$eq: today}}
         });
 
-        if(parkingPlace != null) {
+        if (parkingPlace != null) {
             return parkingPlace;
         }
 
         //building priority
         parkingPlace = await db.collection(TABLE_NAME).findOne({
             building: building,
-            reservationDate: { $not:{$eq: today }}
+            reservationDate: {$not: {$eq: today}}
         });
 
         if (parkingPlace != null) {
             return parkingPlace;
-        };
+        }
+        ;
 
         return anyParkingPlace; //no priority
 
@@ -69,53 +66,30 @@ async function findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(email, bu
         let db = getDb();
 
         let today = Date.now();
-        today.setHours(0, 0, 0,0);
+        today.setHours(0, 0, 0, 0);
+        let tomorrow = new Date(today.getDate() + 1);
 
-
-        //no priority to check if there is any parking place available
+        //no priority to check if there is any not-owned parking place available
         let anyParkingPlace = await db.collection(TABLE_NAME).findOne({
-            reservationDate: { $not:{$eq: today }}
+            reservationDate: {$not: {$eq: tomorrow}},
+            owner_email: ''
         });
 
-        if(anyParkingPlace == null) {
+        if (anyParkingPlace == null) {
             return null;
-        };
+        }
 
         //perform further check with priority filtering
         //building and owner priority
         parkingPlace = await db.collection(TABLE_NAME).findOne({
             building: building,
-            owner_email: null,
-            reservationDate: { $not:{$eq: today }}
-        }).toArray(function(err, result) {
-            if (err) throw err;
-            parkingPlaceList = result;
-            //db.close(); //TODO: close?
-        });
-
-        if(parkingPlace != null) {
-            return parkingPlace;
-        }
-
-        //owner priority
-        parkingPlace = await db.collection(TABLE_NAME).findOne({
-            owner_email: null,
-            reservationDate: { $not:{$eq: today }}
-        });
-
-        if(parkingPlace != null) {
-            return parkingPlace;
-        }
-
-        //building priority
-        parkingPlace = await db.collection(TABLE_NAME).findOne({
-            building: building,
-            reservationDate: { $not:{$eq: today }}
+            owner_email: '',
+            reservationDate: {$not: {$eq: tomorrow}}
         });
 
         if (parkingPlace != null) {
             return parkingPlace;
-        };
+        }
 
         return anyParkingPlace; //no priority
 
@@ -131,52 +105,49 @@ async function findParkingPlaceForTomorrowWithBuildingPriority(email, building) 
         let db = getDb();
 
         let today = new Date();
-        today.setHours(0, 0, 0,0);
+        today.setHours(0, 0, 0, 0);
+        let tomorrow = new Date(today.getDate() + 1);
 
         //no priority to check if there is any parking place available
         let anyParkingPlace = await db.collection(TABLE_NAME).findOne({
-            reservationDate: { $not:{$eq: today }}
+            reservationDate: {$not: {$eq: tomorrow}}
         });
 
-        if(anyParkingPlace == null) {
+        if (anyParkingPlace == null) {
             return null;
-        };
+        }
 
         //perform further check with priority filtering
         //building and owner priority
         parkingPlace = await db.collection(TABLE_NAME).findOne({
             building: building,
-            owner_email: null,
-            reservationDate: { $not:{$eq: today }}
-        }).toArray(function(err, result) {
-            if (err) throw err;
-            parkingPlaceList = result;
-            //db.close(); //TODO: close?
+            owner_email: '',
+            reservationDate: {$not: {$eq: tomorrow}}
         });
 
-        if(parkingPlace != null) {
+        if (parkingPlace != null) {
             return parkingPlace;
         }
 
         //owner priority
         parkingPlace = await db.collection(TABLE_NAME).findOne({
-            owner_email: null,
-            reservationDate: { $not:{$eq: today }}
+            owner_email: '',
+            reservationDate: {$not: {$eq: tomorrow}}
         });
 
-        if(parkingPlace != null) {
+        if (parkingPlace != null) {
             return parkingPlace;
         }
 
         //building priority
         parkingPlace = await db.collection(TABLE_NAME).findOne({
             building: building,
-            reservationDate: { $not:{$eq: today }}
+            reservationDate: {$not: {$eq: tomorrow}}
         });
 
         if (parkingPlace != null) {
             return parkingPlace;
-        };
+        }
 
         return anyParkingPlace; //no priority
 
@@ -185,26 +156,6 @@ async function findParkingPlaceForTomorrowWithBuildingPriority(email, building) 
         return false;
     }
 }
-
-function checkUserReservationDate(dateOfReservation, reservationForToday) {
-    if (!dateOfReservation) {
-        return false;
-    }
-    let now = new Date(),
-        dayNow = now.getDay(),
-        monthNow = now.getMonth() + 1, //in JS: JAN = 0, FEB =1 etc.
-        yearNow = now.getFullYear(),
-        dayReservation = dateOfReservation.getDay(),
-        monthReservation = dateOfReservation.getMonth() + 1,
-        yearReservation = dateOfReservation.getFullYear();
-    if (reservationForToday) {
-        return dayNow === dayReservation && monthNow === monthReservation && yearNow && yearReservation;
-    } else {
-        dayNow += 1; //for tommorrow
-        return dayNow === dayReservation && monthNow === monthReservation && yearNow && yearReservation;
-    }
-}
-
 
 module.exports = {
     findParkingPlaceForTodayWithBuildingPriority,
