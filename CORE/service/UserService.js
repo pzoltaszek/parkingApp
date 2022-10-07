@@ -9,9 +9,7 @@ async function userHasAlreadyReservation(email, reservationForToday) {
             let db = getDb();
             let dateToCheck = createCorrectDateFormat(reservationForToday);
             let userWithReservation = await db.collection(TABLE_NAME).findOne({reservedBy: email, reservationDate: dateToCheck });
-            if (userWithReservation) {
-                return true;
-            }
+            return !!userWithReservation;
         } else {
             Log.error('no user email provided');
             return false;
