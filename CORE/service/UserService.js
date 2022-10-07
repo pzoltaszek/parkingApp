@@ -46,14 +46,7 @@ async function userOwnsParkingSlotAndItsAvailable(email, reservationForToday) {
     try {
         if (email) {
             let db = getDb();
-            let dateToCheck = new Date();
-            dateToCheck.setHours(0, 0, 0, 0);
-            if (!reservationForToday) {
-                let tomorrow = new Date(dateToCheck)
-                tomorrow.setDate(tomorrow.getDate() + 1)
-                tomorrow.setHours(0, 0, 0, 0);
-                dateToCheck = tomorrow;
-            }
+            let dateToCheck =  reservationForToday ?  createCorrectDateFormat(true) : createCorrectDateFormat(false);
             let owner = await db.collection(TABLE_NAME).findOne({
                 owner_email: email,
                 reservationDate: {$not: {$eq: dateToCheck}}
@@ -68,7 +61,7 @@ async function userOwnsParkingSlotAndItsAvailable(email, reservationForToday) {
             return false;
         }
     } catch (error) {
-        Log.error('Database error: cannot find user in "assignOwnerToPlaceForToday"');
+        Log.error('Database error: error in "userOwnsParkingSlotAndItsAvailable"');
         return false;
     }
 }
@@ -76,20 +69,82 @@ async function userOwnsParkingSlotAndItsAvailable(email, reservationForToday) {
 async function assignOwnerToPlaceForToday(email) {
     try {
         if (email) {
-            let today = new Date();
-            today.setHours(0, 0, 0, 0);
-            db.collection(TABLE_NAME).insertOne({
+            let db = getDb();
+            let today = createCorrectDateFormat(true);
+            const update = {
                 reservedBy: email,
                 reservationDate: today
-            });
+            };
+            db.collection(TABLE_NAME).updateOne({owner_email: email}, {$set: update});
         }
     } catch (error) {
-        Log.error('Database error: cannot find user in "assignOwnerToPlaceForToday"');
+        Log.error('Database error: error in "assignOwnerToPlaceForToday"');
+    }
+}
+
+async function assignOwnerToPlaceForTomorrow(email) {
+    try {
+        if (email) {
+            let db = getDb();
+            let today = createCorrectDateFormat(false);
+            const update = {
+                reservedBy: email,
+                reservationDate: today
+            };
+            db.collection(TABLE_NAME).updateOne({owner_email: email}, {$set: update});
+        }
+    } catch (error) {
+        Log.error('Database error: error in "assignOwnerToPlaceForToday"');
+    }
+}
+
+async function assignUserToPlaceForToday(email, placeId) {
+    try {
+        if (email) {
+            let db = getDb();
+            let today = createCorrectDateFormat(true);
+            const update = {
+                reservedBy: email,
+                reservationDate: today
+            };
+            db.collection(TABLE_NAME).updateOne({number: placeId}, {$set: update});
+        }
+    } catch (error) {
+        Log.error('Database error: error in "assignUserToPlaceForToday"');
+    }
+}
+
+async function assignUserToPlaceForTomorrow(email, placeId) {
+    try {
+        if (email) {
+            let db = getDb();
+            let tomorrow = createCorrectDateFormat(false);
+            const update = {
+                reservedBy: email,
+                reservationDate: tomorrow
+            };
+            db.collection(TABLE_NAME).updateOne({number: placeId}, {$set: update});
+        }
+    } catch (error) {
+        Log.error('Database error: error in "assignUserToPlaceForToday"');
+    }
+}
+
+function createCorrectDateFormat(isToday){
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (isToday){
+        return today
+    } else {
+        return today.setDate(today.getDate() +1);
     }
 }
 
 module.exports = {
     userHasAlreadyReservation,
     userOwnsParkingSlotAndItsAvailable,
-    assignOwnerToPlaceForToday
+    assignOwnerToPlaceForToday,
+    assignOwnerToPlaceForTomorrow,
+    assignUserToPlaceForToday,
+    assignUserToPlaceForTomorrow
 }
