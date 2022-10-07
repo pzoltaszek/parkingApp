@@ -2,6 +2,7 @@ const express = require('express');
 const userRouter = express.Router();
 const Log = require('../utils/Log');
 const getDb = require(".././dataBase/db").getDb;
+const UserService  = require('../service/UserService');
 
 const tableName = 't_email';
 
