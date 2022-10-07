@@ -94,7 +94,7 @@ function router() {
                     return res.json({success: false, data: 'TOO_EARLY_FOR_TOMORROW_RESERVATION'}); //za wcześnie na jakiekolwiek rezerwacje na jutro, bo w bazie są jeszcze informacje o dzisiejszych rezerwacjach
                 }
                 if (actualHour < 15) { //tylko właściciel może rezerwować przed 15:00 na jutro
-                    if (await UserService.userOwnsParkingSlot(email)) {
+                    if (await ParkingService.userOwnsParkingSlot(email)) {
                         await UserService.assignOwnerToPlaceForTomorrow(email);
                         return res.json({success: true, data: 'OWNER_PLACE_ASSIGNED'});
                     } else {
@@ -137,7 +137,7 @@ function router() {
                 return res.json({success: false, data: 'LOGIN_FAILED'});
             }
             if (await UserService.userHasAlreadyReservation(email, reservationForToday)) {
-                await UserService.resetReservation(email, reservationForToday); //ustaw datę na przeszłość/null, wyczyść reservedBy
+                await ParkingService.resetReservation(email, reservationForToday); //ustaw datę na przeszłość/null, wyczyść reservedBy
                 return res.json({success: true, data: 'RESERVATION_RESET'});
             }
         } catch (error) { //any error (?)
