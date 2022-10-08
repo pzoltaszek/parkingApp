@@ -31,6 +31,8 @@
 .form-container {
   width: 30%;
   margin: 10rem auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
   background: rgb(238, 174, 202);
   background: linear-gradient(90deg, rgba(238, 174, 202, 1) 0%, rgba(148, 187, 233, 1) 100%);
   border-radius: 5px;
