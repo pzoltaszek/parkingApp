@@ -105,6 +105,21 @@ async function assignUserToPlaceForTomorrow(email, placeId) {
     }
 }
 
+async function checkPlace(email, reservationForToday) {
+    try {
+        if (email) {
+            let db = getDb();
+            let dateToCheck = createCorrectDateFormat(reservationForToday);
+            let userWithReservation = await db.collection(TABLE_NAME).findOne({reservedBy: email, reservationDate: dateToCheck });
+            return userWithReservation;
+        } else {
+            return;
+        }
+    } catch (error) {
+        Log.error('Database error: error in "checkPlace"');
+    }
+}
+
 function createCorrectDateFormat(isToday){
     let today = new Date();
     if (isToday){
@@ -121,5 +136,6 @@ module.exports = {
     assignOwnerToPlaceForToday,
     assignOwnerToPlaceForTomorrow,
     assignUserToPlaceForToday,
-    assignUserToPlaceForTomorrow
+    assignUserToPlaceForTomorrow,
+    checkPlace
 }

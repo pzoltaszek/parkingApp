@@ -24,19 +24,33 @@ export default function ReservationForm() {
                 UserService.assignUser(email, hashedPass, building, reservationForToday).then(response => {
                     setSuccess(response.success);
                     setShowToast(true);
-                    setToastMessage(`success: ${response.success} data: ${response.data}`);
+                    let toDisplay;
+                    if (response.data.number) {
+                        toDisplay = `PLACE ASSIGNED | number: ' ${response.data.number} ' building: ' ${response.data.building}`;
+                    } else {
+                        toDisplay = response.data
+                    }
+                    setToastMessage(toDisplay);
                 });
             })
         }
     }
     const cancelReservation = () => {
-        //TODO
-        setShowToast(true);
+        if (!showToast) {
+        sha512(password).then(hashedPass => {
+            UserService.unassignUser(email, hashedPass, building, reservationForToday)
+            .then(response => {
+                setSuccess(response.success);
+                setShowToast(true);
+                setToastMessage(response.data);
+            });
+        })
+    }
     }
     return (
         <div>
             <ToastContainer position="top-end">
-                <Toast className='d-inline-block m-3' bg={success ? "light" : "danger"} onClose={() => setShowToast(false)} show={showToast} delay={3000} autohide>
+                <Toast className='d-inline-block m-3' bg={success ? "success" : "danger"} onClose={() => setShowToast(false)} show={showToast} delay={3000} autohide>
                     <Toast.Header>
                         <strong className="me-auto">{success ? 'Success' : 'Failed'} </strong>
                     </Toast.Header>

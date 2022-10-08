@@ -146,6 +146,21 @@ function router() {
         }
     });
 
+    userRouter.post("/check", async (req, res) => {
+        const {email, reservationForToday} = req.body;
+        try {
+            let place = await UserService.checkPlace(email, reservationForToday);
+            if (place) {
+                return res.json({success: true, data: place});
+            } else {
+                return res.json({success: false, data: null}); 
+            }
+           
+        } catch (error) { //any error (?)
+            Log.error('Error ' + error);
+        }
+    });
+
     return userRouter;
 }
 
