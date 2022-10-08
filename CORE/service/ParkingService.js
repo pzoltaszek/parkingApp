@@ -61,13 +61,13 @@ async function findParkingPlaceForTodayWithBuildingPriority(building) {
 }
 
 
-async function findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(email, building) {
+async function findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(building) {
     try {
         let db = getDb();
 
-        let today = Date.now();
-        today.setHours(0, 0, 0, 0);
-        let tomorrow = new Date(today.getDate() + 1);
+        let today = new Date();
+        let tomorrow = new Date();
+        tomorrow.setDate(today.getDate() + 1);
 
         //no priority to check if there is any not-owned parking place available
         let anyParkingPlace = await db.collection(TABLE_NAME).findOne({
@@ -100,13 +100,12 @@ async function findNotOwnedParkingPlaceForTomorrowWithBuildingPriority(email, bu
 }
 
 
-async function findParkingPlaceForTomorrowWithBuildingPriority(email, building) {
+async function findParkingPlaceForTomorrowWithBuildingPriority(building) {
     try {
         let db = getDb();
 
-        let today = new Date();
-        today.setHours(0, 0, 0, 0);
-        let tomorrow = new Date(today.getDate() + 1);
+        let tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
 
         //no priority to check if there is any parking place available
         let anyParkingPlace = await db.collection(TABLE_NAME).findOne({
@@ -178,10 +177,9 @@ async function resetReservation(email, reservationForToday) {
         let db = getDb();
 
         let dateToCheck = new Date();
-        dateToCheck.setHours(0, 0, 0, 0);
 
         if (!reservationForToday) {
-            dateToCheck = new Date(dateToCheck.getDate() + 1);
+            dateToCheck.setDate(dateToCheck.getDate() + 1);
         }
 
         const update = {

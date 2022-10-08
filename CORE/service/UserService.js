@@ -25,15 +25,12 @@ async function userOwnsParkingSlotAndItsAvailable(email, reservationForToday) {
         if (email) {
             let db = getDb();
             let dateToCheck =  reservationForToday ?  createCorrectDateFormat(true) : createCorrectDateFormat(false);
-            let owner = await db.collection(TABLE_NAME).findOne({
+
+            let ownPlace = await db.collection(TABLE_NAME).findOne({
                 owner_email: email,
                 reservationDate: {$not: {$eq: dateToCheck}}
             });
-            if (owner) {
-                return !!owner.reservedBy;
-            } else {
-                false;
-            }
+            return ownPlace != null;
         } else {
             Log.error('no user email provided');
             return false;
