@@ -16,7 +16,7 @@ export default function CheckComponent() {
     const onSubmitForm = (event) => {
         event.preventDefault();
         if (!showToast) {
-                UserService.check(email, reservationForToday)
+            UserService.check(email, reservationForToday)
                 .then(response => {
                     setShowToast(true);
                     if (!response.success) {
@@ -24,7 +24,7 @@ export default function CheckComponent() {
                     } else {
                         setToastMessage(`YOUR RESERVATION 
                          number: ' ${response.data.number} ' building: ' ${response.data.building}`);
-                    } 
+                    }
                 });
         }
     }
@@ -34,7 +34,7 @@ export default function CheckComponent() {
             <ToastContainer position="top-end">
                 <Toast className='d-inline-block m-3' bg="success" onClose={() => setShowToast(false)} show={showToast} delay={3000} autohide>
                     <Toast.Header>
-                        <strong className="me-auto">'Success'</strong>
+                        <strong className="me-auto">Success</strong>
                     </Toast.Header>
                     <Toast.Body>{toastMessage}</Toast.Body>
                 </Toast>

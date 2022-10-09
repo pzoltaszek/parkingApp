@@ -37,15 +37,15 @@ export default function ReservationForm() {
     }
     const cancelReservation = () => {
         if (!showToast) {
-        sha512(password).then(hashedPass => {
-            UserService.unassignUser(email, hashedPass, building, reservationForToday)
-            .then(response => {
-                setSuccess(response.success);
-                setShowToast(true);
-                setToastMessage(response.data);
-            });
-        })
-    }
+            sha512(password).then(hashedPass => {
+                UserService.unassignUser(email, hashedPass, building, reservationForToday)
+                    .then(response => {
+                        setSuccess(response.success);
+                        setShowToast(true);
+                        setToastMessage(response.data);
+                    });
+            })
+        }
     }
     return (
         <div>
