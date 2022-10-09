@@ -1,14 +1,22 @@
 import './App.css';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import ReservationForm from "./components/ReservationForm";
-import CheckComponent from './components/CheckComponent';
+import SimpleForm from "./components/SimpleForm";
 
 function App() {
+  const inputsReservation = [{
+    label: "Email address", type: "email", placeholder: "Enter email"
+  },
+  { label: "Password", type: "password", placeholder: "Password" }
+  ]
+  const inputsCheck = [{
+    label: "Email address", type: "email", placeholder: "Enter email"
+  }
+  ]
   return (
     <div className="App">
-      <ReservationForm />
-      <CheckComponent/>
+      <SimpleForm componentType="reservation" title="Parking spot reservation" inputs={inputsReservation} buildingDropdown />
+      <SimpleForm componentType="check" title="Check your reservation" inputs={inputsCheck} />
     </div>
   );
 }
