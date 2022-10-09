@@ -7,6 +7,9 @@ const LoginService  = require('../service/LoginService');
 const ParkingService = require('../service/ParkingService');
 
 const tableName = 't_email';
+const TODAY_HOUR = 8;
+const TOMORROW_OWNER_HOUR = 10;
+
 
 function router() {
     userRouter.post("/findUser", async (req, res) => {
@@ -73,7 +76,7 @@ function router() {
             }
             let actualHour = new Date().getHours();
             if (reservationForToday) {
-                if (actualHour > 13) {
+                if (actualHour > TODAY_HOUR) {
                     return res.json({success: false, data: 'TOO_LATE_FOR_TODAY_RESERVATION'}); //nie ma sensu już tak późno rezerwować na dziś
                 }
                 if (await UserService.userOwnsParkingSlotAndItsAvailable(email, reservationForToday)) { //miejsce właściciela może być już zajęte
@@ -90,10 +93,10 @@ function router() {
                     }
                 }
             } else { //rezerwacja na jutro
-                if (actualHour < 13) {
+                if (actualHour < TODAY_HOUR) {
                     return res.json({success: false, data: 'TOO_EARLY_FOR_TOMORROW_RESERVATION'}); //za wcześnie na jakiekolwiek rezerwacje na jutro, bo w bazie są jeszcze informacje o dzisiejszych rezerwacjach
                 }
-                if (actualHour < 15) { //tylko właściciel może rezerwować przed 15:00 na jutro
+                if (actualHour < TOMORROW_OWNER_HOUR) { //tylko właściciel może rezerwować przed daną godziną na jutro
                     if (await ParkingService.userOwnsParkingSlot(email)) {
                         await UserService.assignOwnerToPlaceForTomorrow(email);
                         return res.json({success: true, data: 'OWNER_PLACE_ASSIGNED'});
@@ -139,6 +142,8 @@ function router() {
             if (await UserService.userHasAlreadyReservation(email, reservationForToday)) {
                 await ParkingService.resetReservation(email, reservationForToday); //ustaw datę na przeszłość/null, wyczyść reservedBy
                 return res.json({success: true, data: 'RESERVATION_RESET'});
+            } else {
+                return res.json({success: true, data: 'NO_RESERVATION_TO_RESET'});
             }
         } catch (error) { //any error (?)
             Log.error('Error ' + error);
